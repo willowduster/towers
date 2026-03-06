@@ -246,6 +246,15 @@ main {
   overflow: hidden;
 }
 
+/* On portrait mobile, drop the fixed aspect ratio so the stream
+   section fills available space without pushing the footer off-screen */
+@media (max-width: 600px) and (orientation: portrait) {
+  .stream-wrapper {
+    aspect-ratio: auto;
+    height: 100%;
+  }
+}
+
 .stream-video {
   width: 100%;
   height: 100%;
@@ -431,13 +440,37 @@ main {
     padding: 3.5rem 1.2rem;
   }
 
+  .footer-inner {
+    padding: 0.5rem 1.2rem;
+  }
+
   .footer-links {
-    flex-direction: column;
-    gap: 1rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8rem;
+  }
+
+  .footer-link {
+    font-size: 0.6rem;
+    gap: 0.35rem;
+  }
+
+  .footer-icon {
+    width: 14px;
+    height: 14px;
   }
 
   .footer-sep {
     display: none;
+  }
+
+  .stream-offline-logo {
+    max-width: 70vw;
+  }
+
+  .stream-offline-text {
+    font-size: 0.8rem;
   }
 }
 
