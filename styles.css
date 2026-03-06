@@ -66,94 +66,12 @@ img {
   max-width: 100%;
 }
 
-/* ── Loading Screen ──────────────────────────────────────────── */
-#loader {
-  position: fixed;
-  inset: 0;
-  background: var(--bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  transition: opacity 0.8s ease, visibility 0.8s ease;
-}
-
-#loader.loader-done {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.loader-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2.5rem;
-  animation: loaderFadeIn 0.6s ease forwards;
-}
-
-@keyframes loaderFadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.loader-logo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.2rem;
-}
-
-.loader-logo-img {
-  width: min(500px, 70vw);
-  height: auto;
-  animation: pulse 3s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.85; }
-  50%       { opacity: 1; }
-}
-
-.loader-bar {
-  width: 160px;
-  height: 1px;
-  background: var(--border);
-  overflow: hidden;
-  border-radius: 1px;
-}
-
-.loader-fill {
-  display: block;
-  height: 100%;
-  width: 0;
-  background: var(--accent);
-  animation: loadBar 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-@keyframes loadBar {
-  0%   { width: 0; }
-  60%  { width: 80%; }
-  100% { width: 100%; }
-}
-
 /* ── Site Wrapper ────────────────────────────────────────────── */
 #site {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  transition: opacity 0.8s ease;
   overflow: hidden;
-}
-
-.site-hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.site-visible {
-  opacity: 1;
-  pointer-events: auto;
 }
 
 main {
@@ -358,13 +276,13 @@ main {
 }
 
 .stream-offline-logo {
-  max-width: min(500px, 70vw);
+  max-width: min(800px, 85vw);
   height: auto;
   opacity: 0.6;
 }
 
 .stream-offline-text {
-  font-size: 0.65rem;
+  font-size: 1rem;
   letter-spacing: 0.25em;
   text-transform: uppercase;
   color: var(--text-muted);

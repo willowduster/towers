@@ -105,38 +105,6 @@
     yearEl.textContent = new Date().getFullYear();
   }
 
-  // ── Loading screen ────────────────────────────────────────────
-  var loader = document.getElementById('loader');
-  var site   = document.getElementById('site');
-
-  function revealSite() {
-    if (loader) {
-      loader.classList.add('loader-done');
-    }
-    if (site) {
-      site.classList.remove('site-hidden');
-      site.classList.add('site-visible');
-    }
-    // Trigger initial fade-in sections that are already in view
-    checkFadeIns();
-  }
-
-  // Minimum display time for the loading screen (ms)
-  var MIN_LOADER_MS = 1800;
-  var startTime = Date.now();
-
-  function onReady() {
-    var elapsed = Date.now() - startTime;
-    var remaining = Math.max(0, MIN_LOADER_MS - elapsed);
-    setTimeout(revealSite, remaining);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', onReady);
-  } else {
-    onReady();
-  }
-
   // ── Scroll-triggered fade-in sections ─────────────────────────
   var fadeSections = [];
 
