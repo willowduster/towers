@@ -2,6 +2,103 @@
 (function () {
   'use strict';
 
+  // ── Stream status check ───────────────────────────────────────
+  var OWNCAST_URL = 'https://stream.willowduster.com';
+  var HLS_URL = OWNCAST_URL + '/hls/stream.m3u8';
+  var streamVideo = document.getElementById('stream-video');
+  var streamOffline = document.getElementById('stream-offline');
+  var unmuteOverlay = document.getElementById('unmute-overlay');
+  var unmuteBtn = document.getElementById('unmute-btn');
+  var isLive = false;
+  var hls = null;
+
+  // Dismiss unmute overlay on click
+  unmuteBtn.addEventListener('click', function () {
+    streamVideo.muted = false;
+    unmuteOverlay.classList.add('unmute-overlay-hidden');
+  });
+
+  function showUnmuteHint() {
+    unmuteOverlay.classList.remove('unmute-overlay-hidden');
+    // Auto-dismiss after 4 seconds
+    setTimeout(function () {
+      unmuteOverlay.classList.add('unmute-overlay-hidden');
+    }, 4000);
+  }
+
+  function showStream() {
+    if (isLive) return;
+    isLive = true;
+
+    if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+      hls = new Hls({ enableWorker: true });
+      hls.loadSource(HLS_URL);
+      hls.attachMedia(streamVideo);
+      hls.on(Hls.Events.MANIFEST_PARSED, function () {
+        streamVideo.play().catch(function () {
+          streamVideo.muted = true;
+          streamVideo.play();
+        });
+        showUnmuteHint();
+      });
+      hls.on(Hls.Events.ERROR, function (event, data) {
+        if (data.fatal) {
+          destroyHls();
+          showOffline();
+        }
+      });
+    } else if (streamVideo.canPlayType('application/vnd.apple.mpegurl')) {
+      streamVideo.src = HLS_URL;
+      streamVideo.addEventListener('loadedmetadata', function () {
+        streamVideo.play().catch(function () {
+          streamVideo.muted = true;
+          streamVideo.play();
+        });
+        showUnmuteHint();
+      });
+    }
+
+    streamVideo.classList.remove('stream-video-hidden');
+    streamOffline.classList.add('stream-offline-hidden');
+  }
+
+  function destroyHls() {
+    if (hls) {
+      hls.destroy();
+      hls = null;
+    }
+  }
+
+  function showOffline() {
+    destroyHls();
+    streamVideo.removeAttribute('src');
+    isLive = false;
+    streamVideo.classList.add('stream-video-hidden');
+    streamOffline.classList.remove('stream-offline-hidden');
+  }
+
+  function checkStreamStatus() {
+    fetch(OWNCAST_URL + '/api/status')
+      .then(function (res) {
+        if (!res.ok) throw new Error('not ok');
+        return res.json();
+      })
+      .then(function (data) {
+        if (data && data.online) {
+          showStream();
+        } else {
+          showOffline();
+        }
+      })
+      .catch(function () {
+        showOffline();
+      });
+  }
+
+  // Check immediately and poll every 10 seconds
+  checkStreamStatus();
+  setInterval(checkStreamStatus, 10000);
+
   // ── Year in footer ────────────────────────────────────────────
   var yearEl = document.getElementById('year');
   if (yearEl) {
