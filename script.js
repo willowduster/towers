@@ -11,7 +11,6 @@
   var unmuteBtn = document.getElementById('unmute-btn');
   var isLive = false;
   var hls = null;
-  var streamFallbacks = document.getElementById('stream-fallbacks');
 
   // Dismiss unmute overlay on click
   unmuteBtn.addEventListener('click', function () {
@@ -61,7 +60,6 @@
 
     streamVideo.classList.remove('stream-video-hidden');
     streamOffline.classList.add('stream-offline-hidden');
-    streamFallbacks.classList.add('stream-fallbacks-hidden');
   }
 
   function destroyHls() {
@@ -77,7 +75,6 @@
     isLive = false;
     streamVideo.classList.add('stream-video-hidden');
     streamOffline.classList.remove('stream-offline-hidden');
-    streamFallbacks.classList.remove('stream-fallbacks-hidden');
   }
 
   function checkStreamStatus() {
