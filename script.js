@@ -2,6 +2,16 @@
 (function () {
   'use strict';
 
+  // ── Reliable mobile viewport height ───────────────────────────
+  function setAppHeight() {
+    document.documentElement.style.setProperty(
+      '--app-height',
+      window.innerHeight + 'px'
+    );
+  }
+  setAppHeight();
+  window.addEventListener('resize', setAppHeight);
+
   // ── Stream status check ───────────────────────────────────────
   var OWNCAST_URL = 'https://stream.willowduster.com';
   var HLS_URL = OWNCAST_URL + '/hls/stream.m3u8';
