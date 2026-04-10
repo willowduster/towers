@@ -107,7 +107,15 @@
     if (isLive || ytShowing) return;
     ytShowing = true;
 
-    if (ytPlayer && typeof ytPlayer.loadPlaylist === 'function') {
+    // Fade out the offline screen, fade in the YouTube player
+    streamOffline.classList.add('stream-offline-hidden');
+    ytPlayerWrap.classList.remove('yt-player-hidden');
+
+    loadYouTubePlaylist();
+  }
+
+  function loadYouTubePlaylist() {
+    if (ytReady && ytPlayer && typeof ytPlayer.loadPlaylist === 'function') {
       ytPlayer.loadPlaylist({
         listType: 'playlist',
         list: YT_PLAYLIST_ID,
@@ -115,14 +123,12 @@
         startSeconds: 0
       });
     }
-
-    // Fade out the offline screen, fade in the YouTube player
-    streamOffline.classList.add('stream-offline-hidden');
-    ytPlayerWrap.classList.remove('yt-player-hidden');
   }
 
   function initYouTubePlayer() {
     ytPlayer = new YT.Player('yt-player', {
+      width: '100%',
+      height: '100%',
       playerVars: {
         autoplay: 0,
         controls: 1,
@@ -134,7 +140,10 @@
       events: {
         onReady: function () {
           ytReady = true;
-          // If we're already offline and the timer has already fired, show now
+          // If we're already showing the YT area but playlist hasn't loaded yet
+          if (ytShowing) {
+            loadYouTubePlaylist();
+          }
         },
         onStateChange: function (event) {
           // When a video ends, play the next one in the playlist
@@ -151,13 +160,18 @@
     initYouTubePlayer();
   };
 
+  // If the API loaded before this script ran, init now
+  if (typeof YT !== 'undefined' && YT.Player) {
+    initYouTubePlayer();
+  }
+
   function startOfflineTimer() {
     clearTimeout(offlineTimer);
     offlineTimer = setTimeout(function () {
       if (!isLive) {
         showYouTube();
       }
-    }, 5000);
+    }, 3000);
   }
 
   function showOffline() {
