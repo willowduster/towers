@@ -29,12 +29,15 @@
   var ytPlayer = null;
   var ytReady = false;
   var ytShowing = false;
+  var ytUserUnmuted = false;
 
   // Dismiss unmute overlay on click
   unmuteBtn.addEventListener('click', function () {
     streamVideo.muted = false;
     if (ytPlayer && typeof ytPlayer.unMute === 'function') {
       ytPlayer.unMute();
+      ytPlayer.setVolume(100);
+      ytUserUnmuted = true;
     }
     unmuteOverlay.classList.add('unmute-overlay-hidden');
   });
@@ -153,13 +156,15 @@
           }
         },
         onStateChange: function (event) {
-          // When playlist is cued, start playback (muted for autoplay)
+          // When playlist is cued, start playback
           if (event.data === YT.PlayerState.CUED) {
-            ytPlayer.mute();
+            if (!ytUserUnmuted) {
+              ytPlayer.mute();
+            }
             ytPlayer.playVideo();
           }
           // Show unmute overlay when video starts playing muted
-          if (event.data === YT.PlayerState.PLAYING && ytPlayer.isMuted()) {
+          if (event.data === YT.PlayerState.PLAYING && ytPlayer.isMuted() && !ytUserUnmuted) {
             unmuteOverlay.classList.remove('unmute-overlay-hidden');
           }
           // When a video ends, play the next one in the playlist
