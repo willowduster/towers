@@ -15,7 +15,6 @@
   // ── Stream status check ───────────────────────────────────────
   var OWNCAST_URL = 'https://stream.willowduster.com';
   var HLS_URL = OWNCAST_URL + '/hls/stream.m3u8';
-  var YT_PLAYLIST_ID = 'PL3L7IDSgjMHTcHMWr9IPVm1-I3ipbjkOG';
   var streamVideo = document.getElementById('stream-video');
   var streamOffline = document.getElementById('stream-offline');
   var unmuteOverlay = document.getElementById('unmute-overlay');
@@ -104,11 +103,8 @@
     if (isLive || ytShowing) return;
     ytShowing = true;
 
-    // Embed latest video with uploads playlist for auto-advance
-    ytIframe.src = 'https://www.youtube.com/embed/videoseries?list='
-      + encodeURIComponent(YT_PLAYLIST_ID);
+    ytIframe.src = 'https://www.youtube.com/embed/11Xor4quOPc';
 
-    // Fade out the offline screen, fade in the YouTube player
     streamOffline.classList.add('stream-offline-hidden');
     ytPlayerWrap.classList.remove('yt-player-hidden');
   }
