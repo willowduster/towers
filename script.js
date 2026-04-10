@@ -33,6 +33,9 @@
   // Dismiss unmute overlay on click
   unmuteBtn.addEventListener('click', function () {
     streamVideo.muted = false;
+    if (ytPlayer && typeof ytPlayer.unMute === 'function') {
+      ytPlayer.unMute();
+    }
     unmuteOverlay.classList.add('unmute-overlay-hidden');
   });
 
@@ -154,6 +157,10 @@
           if (event.data === YT.PlayerState.CUED) {
             ytPlayer.mute();
             ytPlayer.playVideo();
+          }
+          // Show unmute overlay when video starts playing muted
+          if (event.data === YT.PlayerState.PLAYING && ytPlayer.isMuted()) {
+            unmuteOverlay.classList.remove('unmute-overlay-hidden');
           }
           // When a video ends, play the next one in the playlist
           if (event.data === YT.PlayerState.ENDED) {
