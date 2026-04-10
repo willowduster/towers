@@ -306,6 +306,27 @@ main {
   pointer-events: none;
 }
 
+/* ── YouTube fallback player ─────────────────────────────────── */
+.yt-player-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: #000;
+  opacity: 1;
+  transition: opacity 1.5s ease;
+}
+
+.yt-player-wrap iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.yt-player-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .unmute-overlay {
   position: absolute;
   inset: 0;

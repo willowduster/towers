@@ -15,12 +15,18 @@
   // ── Stream status check ───────────────────────────────────────
   var OWNCAST_URL = 'https://stream.willowduster.com';
   var HLS_URL = OWNCAST_URL + '/hls/stream.m3u8';
+  var YT_PLAYLIST_ID = 'PL3L7IDSgjMHTcHMWr9IPVm1-I3ipbjkOG';
   var streamVideo = document.getElementById('stream-video');
   var streamOffline = document.getElementById('stream-offline');
   var unmuteOverlay = document.getElementById('unmute-overlay');
   var unmuteBtn = document.getElementById('unmute-btn');
+  var ytPlayerWrap = document.getElementById('yt-player-wrap');
   var isLive = false;
   var hls = null;
+  var offlineTimer = null;
+  var ytPlayer = null;
+  var ytReady = false;
+  var ytShowing = false;
 
   // Dismiss unmute overlay on click
   unmuteBtn.addEventListener('click', function () {
@@ -39,6 +45,13 @@
   function showStream() {
     if (isLive) return;
     isLive = true;
+
+    // Cancel any pending offline→YouTube transition
+    clearTimeout(offlineTimer);
+    offlineTimer = null;
+
+    // Hide YouTube player if it's showing
+    hideYouTube();
 
     if (typeof Hls !== 'undefined' && Hls.isSupported()) {
       hls = new Hls({ enableWorker: true });
@@ -79,12 +92,86 @@
     }
   }
 
+  // ── YouTube fallback player ───────────────────────────────────
+  function hideYouTube() {
+    if (ytShowing) {
+      ytShowing = false;
+      ytPlayerWrap.classList.add('yt-player-hidden');
+      if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
+        ytPlayer.pauseVideo();
+      }
+    }
+  }
+
+  function showYouTube() {
+    if (isLive || ytShowing) return;
+    ytShowing = true;
+
+    if (ytPlayer && typeof ytPlayer.loadPlaylist === 'function') {
+      ytPlayer.loadPlaylist({
+        listType: 'playlist',
+        list: YT_PLAYLIST_ID,
+        index: 0,
+        startSeconds: 0
+      });
+    }
+
+    // Fade out the offline screen, fade in the YouTube player
+    streamOffline.classList.add('stream-offline-hidden');
+    ytPlayerWrap.classList.remove('yt-player-hidden');
+  }
+
+  function initYouTubePlayer() {
+    ytPlayer = new YT.Player('yt-player', {
+      playerVars: {
+        autoplay: 0,
+        controls: 1,
+        modestbranding: 1,
+        rel: 0,
+        playsinline: 1,
+        iv_load_policy: 3
+      },
+      events: {
+        onReady: function () {
+          ytReady = true;
+          // If we're already offline and the timer has already fired, show now
+        },
+        onStateChange: function (event) {
+          // When a video ends, play the next one in the playlist
+          if (event.data === YT.PlayerState.ENDED) {
+            ytPlayer.nextVideo();
+          }
+        }
+      }
+    });
+  }
+
+  // YouTube IFrame API calls this global function when ready
+  window.onYouTubeIframeAPIReady = function () {
+    initYouTubePlayer();
+  };
+
+  function startOfflineTimer() {
+    clearTimeout(offlineTimer);
+    offlineTimer = setTimeout(function () {
+      if (!isLive) {
+        showYouTube();
+      }
+    }, 5000);
+  }
+
   function showOffline() {
     destroyHls();
     streamVideo.removeAttribute('src');
+    var wasLive = isLive;
     isLive = false;
     streamVideo.classList.add('stream-video-hidden');
-    streamOffline.classList.remove('stream-offline-hidden');
+
+    if (!ytShowing) {
+      streamOffline.classList.remove('stream-offline-hidden');
+      // Start 5-second timer to transition to YouTube videos
+      startOfflineTimer();
+    }
   }
 
   function checkStreamStatus() {
