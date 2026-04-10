@@ -118,6 +118,7 @@
 
   function loadYouTubePlaylist() {
     if (ytReady && ytPlayer && typeof ytPlayer.loadPlaylist === 'function') {
+      ytPlayer.mute();
       ytPlayer.loadPlaylist({
         listType: 'playlist',
         list: YT_UPLOADS_PL,
@@ -132,11 +133,12 @@
       width: '100%',
       height: '100%',
       playerVars: {
-        autoplay: 0,
+        autoplay: 1,
         controls: 1,
         modestbranding: 1,
         rel: 0,
         playsinline: 1,
+        mute: 1,
         iv_load_policy: 3
       },
       events: {
@@ -148,6 +150,11 @@
           }
         },
         onStateChange: function (event) {
+          // When playlist is cued, start playback (muted for autoplay)
+          if (event.data === YT.PlayerState.CUED) {
+            ytPlayer.mute();
+            ytPlayer.playVideo();
+          }
           // When a video ends, play the next one in the playlist
           if (event.data === YT.PlayerState.ENDED) {
             ytPlayer.nextVideo();
