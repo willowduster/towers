@@ -15,7 +15,9 @@
   // ── Stream status check ───────────────────────────────────────
   var OWNCAST_URL = 'https://stream.willowduster.com';
   var HLS_URL = OWNCAST_URL + '/hls/stream.m3u8';
-  var YT_PLAYLIST_ID = 'PL3L7IDSgjMHTcHMWr9IPVm1-I3ipbjkOG';
+  var YT_CHANNEL_ID = 'UC-Ij91c6EnZTlMyepNNB19Q';
+  // Uploads playlist = channel ID with "UC" replaced by "UU"
+  var YT_UPLOADS_PL = 'UU' + YT_CHANNEL_ID.slice(2);
   var streamVideo = document.getElementById('stream-video');
   var streamOffline = document.getElementById('stream-offline');
   var unmuteOverlay = document.getElementById('unmute-overlay');
@@ -118,7 +120,7 @@
     if (ytReady && ytPlayer && typeof ytPlayer.loadPlaylist === 'function') {
       ytPlayer.loadPlaylist({
         listType: 'playlist',
-        list: YT_PLAYLIST_ID,
+        list: YT_UPLOADS_PL,
         index: 0,
         startSeconds: 0
       });
