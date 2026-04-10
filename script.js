@@ -15,8 +15,7 @@
   // ── Stream status check ───────────────────────────────────────
   var OWNCAST_URL = 'https://stream.willowduster.com';
   var HLS_URL = OWNCAST_URL + '/hls/stream.m3u8';
-  var YT_CHANNEL_ID = 'UC-Ij91c6EnZTlMyepNNB19Q';
-  var YT_UPLOADS_PL = 'UU' + YT_CHANNEL_ID.slice(2);
+  var YT_PLAYLIST_ID = 'PL3L7IDSgjMHTcHMWr9IPVm1-I3ipbjkOG';
   var streamVideo = document.getElementById('stream-video');
   var streamOffline = document.getElementById('stream-offline');
   var unmuteOverlay = document.getElementById('unmute-overlay');
@@ -105,9 +104,9 @@
     if (isLive || ytShowing) return;
     ytShowing = true;
 
-    // Simple embed — user clicks play, gets full audio
-    ytIframe.src = 'https://www.youtube.com/embed/videoseries?list=' + YT_UPLOADS_PL
-      + '&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3';
+    // Embed latest video with uploads playlist for auto-advance
+    ytIframe.src = 'https://www.youtube.com/embed/videoseries?list='
+      + encodeURIComponent(YT_PLAYLIST_ID);
 
     // Fade out the offline screen, fade in the YouTube player
     streamOffline.classList.add('stream-offline-hidden');
