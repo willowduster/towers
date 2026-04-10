@@ -16,18 +16,16 @@
   var OWNCAST_URL = 'https://stream.willowduster.com';
   var HLS_URL = OWNCAST_URL + '/hls/stream.m3u8';
   var YT_CHANNEL_ID = 'UC-Ij91c6EnZTlMyepNNB19Q';
-  // Uploads playlist = channel ID with "UC" replaced by "UU"
   var YT_UPLOADS_PL = 'UU' + YT_CHANNEL_ID.slice(2);
   var streamVideo = document.getElementById('stream-video');
   var streamOffline = document.getElementById('stream-offline');
   var unmuteOverlay = document.getElementById('unmute-overlay');
   var unmuteBtn = document.getElementById('unmute-btn');
   var ytPlayerWrap = document.getElementById('yt-player-wrap');
+  var ytIframe = document.getElementById('yt-player');
   var isLive = false;
   var hls = null;
   var offlineTimer = null;
-  var ytPlayer = null;
-  var ytReady = false;
   var ytShowing = false;
 
   // Dismiss unmute overlay on click (for live stream)
@@ -99,9 +97,7 @@
     if (ytShowing) {
       ytShowing = false;
       ytPlayerWrap.classList.add('yt-player-hidden');
-      if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
-        ytPlayer.pauseVideo();
-      }
+      ytIframe.removeAttribute('src');
     }
   }
 
@@ -109,68 +105,13 @@
     if (isLive || ytShowing) return;
     ytShowing = true;
 
+    // Simple embed — user clicks play, gets full audio
+    ytIframe.src = 'https://www.youtube.com/embed/videoseries?list=' + YT_UPLOADS_PL
+      + '&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3';
+
     // Fade out the offline screen, fade in the YouTube player
     streamOffline.classList.add('stream-offline-hidden');
     ytPlayerWrap.classList.remove('yt-player-hidden');
-
-    loadYouTubePlaylist();
-  }
-
-  function loadYouTubePlaylist() {
-    if (ytReady && ytPlayer && typeof ytPlayer.loadPlaylist === 'function') {
-      ytPlayer.mute();
-      ytPlayer.loadPlaylist({
-        listType: 'playlist',
-        list: YT_UPLOADS_PL,
-        index: 0,
-        startSeconds: 0
-      });
-    }
-  }
-
-  function initYouTubePlayer() {
-    ytPlayer = new YT.Player('yt-player', {
-      width: '100%',
-      height: '100%',
-      playerVars: {
-        autoplay: 1,
-        controls: 1,
-        modestbranding: 1,
-        rel: 0,
-        playsinline: 1,
-        mute: 1,
-        iv_load_policy: 3
-      },
-      events: {
-        onReady: function () {
-          ytReady = true;
-          // If we're already showing the YT area but playlist hasn't loaded yet
-          if (ytShowing) {
-            loadYouTubePlaylist();
-          }
-        },
-        onStateChange: function (event) {
-          // When playlist is cued, start playback (muted for autoplay)
-          if (event.data === YT.PlayerState.CUED) {
-            ytPlayer.playVideo();
-          }
-          // When a video ends, play the next one in the playlist
-          if (event.data === YT.PlayerState.ENDED) {
-            ytPlayer.nextVideo();
-          }
-        }
-      }
-    });
-  }
-
-  // YouTube IFrame API calls this global function when ready
-  window.onYouTubeIframeAPIReady = function () {
-    initYouTubePlayer();
-  };
-
-  // If the API loaded before this script ran, init now
-  if (typeof YT !== 'undefined' && YT.Player) {
-    initYouTubePlayer();
   }
 
   function startOfflineTimer() {
